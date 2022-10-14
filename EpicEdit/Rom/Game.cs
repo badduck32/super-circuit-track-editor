@@ -228,21 +228,21 @@ namespace EpicEdit.Rom
         /// </summary>
         private void ValidateRom()
         {
-            if (!IsSnesRom())
+            if (!IsGbaRom())
             {
-                throw new InvalidDataException($"\"{FileName}\" is not an SNES ROM.");
+                throw new InvalidDataException($"\"{FileName}\" is not a GBA ROM.");
             }
 
             if (!IsSuperMarioKart())
             {
-                throw new InvalidDataException($"\"{FileName}\" is not a Super Mario Kart ROM.");
+                throw new InvalidDataException($"\"{FileName}\" is not a Mario Kart: Super Circuit ROM.");
             }
         }
 
         /// <summary>
         /// Checks whether the file loaded is a Super Nintendo ROM.
         /// </summary>
-        private bool IsSnesRom()
+        private bool IsGbaRom()
         {
             var romHeaderSize = _romBuffer.Length % RomSize.Size256;
 
