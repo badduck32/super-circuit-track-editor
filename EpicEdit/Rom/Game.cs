@@ -240,7 +240,7 @@ namespace EpicEdit.Rom
         }
 
         /// <summary>
-        /// Checks whether the file loaded is a Super Nintendo ROM.
+        /// Checks whether the file loaded is a Gameboy Advance ROM.
         /// </summary>
         private bool IsGbaRom()
         {
