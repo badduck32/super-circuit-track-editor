@@ -38,9 +38,11 @@ namespace EpicEdit.Rom
     {
         #region Constants
 
-        private const int RomTypeOffset = 0xFFD5;
-        private const int CartTypeOffset = 0xFFD6;
-        private const int RomSizeOffset = 0xFFD7;
+        private const int mkscAOffset = 0x00AC;// offsets for AMKE code in rom for check
+        private const int mkscMOffset = 0x00AD;//
+        private const int mkscKOffset = 0x00AE;//
+        private const int mkscEOffset = 0x00AF;//
+
         private const int RamSizeOffset = 0xFFD8;
         private const int RegionOffset = 0xFFD9;
         private const int ChecksumOffset1 = 0xFFDC;
@@ -276,16 +278,16 @@ namespace EpicEdit.Rom
         /// </summary>
         private bool IsSuperMarioKart()
         {
-            if (_romBuffer.Length < RomSize.Size512)
+            if (_romBuffer.Length < RomSize.Size4096)
             {
                 return false;
             }
 
-            var cartType = _romBuffer[CartTypeOffset]; // Cartridge type. SMK has 05 here, if this byte in any SNES ROM is not 05 then it is not a battery backed DSP-1 game
-            var cartRamSize = _romBuffer[RamSizeOffset]; // Cart RAM size. SMK has 01 here, to say that there's 2 KiB of oncart RAM
-            var cartRomType = _romBuffer[RomTypeOffset]; // SMK has 31 here, to indicate a HiROM FastROM game
-
-            if (cartType != 0x05 || cartRamSize != 0x01 || cartRomType != 0x31)
+            var mkscA = _romBuffer[mkscAOffset]; //
+            var mkscM = _romBuffer[mkscMOffset]; //
+            var mkscK = _romBuffer[mkscKOffset]; //
+            var mkscE = _romBuffer[mkscEOffset]; //probably a better way to ID a game, but this works for now -Antimattur
+            if (mkscA != 0x41 || mkscM != 0x4d || mkscK != 0x4b || mkscE != 0x45)
             {
                 return false;
             }
@@ -459,14 +461,14 @@ namespace EpicEdit.Rom
 
         private void SetRegion()
         {
-            int region = _romBuffer[RegionOffset];
+            //int region = _romBuffer[RegionOffset];
+            //
+            //if (!Enum.IsDefined(typeof(Region), region))
+            //{
+            //    throw new InvalidDataException($"\"{FileName}\" has an invalid region. Value at {(RegionOffset + _romHeader.Length):X} must be 0, 1 or 2, was: {region:X}.");
+            //}
 
-            if (!Enum.IsDefined(typeof(Region), region))
-            {
-                throw new InvalidDataException($"\"{FileName}\" has an invalid region. Value at {(RegionOffset + _romHeader.Length):X} must be 0, 1 or 2, was: {region:X}.");
-            }
-
-            _region = (Region)region;
+            _region = (Region)01; // Hardcoded To US version (couldn't find region info in rom). TODO: add other regions 
         }
 
         public static Region GetRegion(byte[] romBuffer)
@@ -1097,7 +1099,7 @@ namespace EpicEdit.Rom
             FilePath = filePath;
 
             SaveDataToBuffer();
-            SetChecksum();
+            //SetChecksum(); -fix later i don't wanna do this rn
             SaveFile();
             ResetModifiedState();
         }
@@ -1144,7 +1146,7 @@ namespace EpicEdit.Rom
             // 11 = 16 Mb
             // 12 = 32 Mb
             // 13 = 64 Mb
-            _romBuffer[RomSizeOffset] = (byte)(sizeIndex + 8);
+            //ADD BACK  _romBuffer[RomSizeOffset] = (byte)(sizeIndex + 8);
 
             // Reset the checksum in case it is corrupted
             _romBuffer[ChecksumOffset1] = 0xFF;
